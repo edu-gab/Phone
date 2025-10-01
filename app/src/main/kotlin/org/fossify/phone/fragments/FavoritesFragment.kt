@@ -32,6 +32,7 @@ import org.fossify.phone.extensions.setupWithContacts
 import org.fossify.phone.extensions.startCallWithConfirmationCheck
 import org.fossify.phone.extensions.startContactDetailsIntent
 import org.fossify.phone.interfaces.RefreshItemsListener
+import android.view.View
 
 class FavoritesFragment(context: Context, attributeSet: AttributeSet) : MyViewPagerFragment<MyViewPagerFragment.LettersInnerBinding>(context, attributeSet),
     RefreshItemsListener {
@@ -53,6 +54,9 @@ class FavoritesFragment(context: Context, attributeSet: AttributeSet) : MyViewPa
 
         binding.fragmentPlaceholder.text = context.getString(placeholderResId)
         binding.fragmentPlaceholder2.beGone()
+
+        binding.fragmentPlaceholder.visibility = View.GONE
+        binding.fragmentPlaceholder2.visibility = View.GONE
     }
 
     override fun setupColors(textColor: Int, primaryColor: Int, properPrimaryColor: Int) {
@@ -98,6 +102,8 @@ class FavoritesFragment(context: Context, attributeSet: AttributeSet) : MyViewPa
     }
 
     private fun gotContacts(contacts: ArrayList<Contact>) {
+        binding.fragmentPlaceholder.beGone()
+        binding.fragmentPlaceholder2.beGone()
         setupLetterFastScroller(contacts)
         binding.apply {
             if (contacts.isEmpty()) {
@@ -204,7 +210,7 @@ class FavoritesFragment(context: Context, attributeSet: AttributeSet) : MyViewPa
             it.name.startsWith(fixedText, true)
         }.toMutableList() as ArrayList<Contact>
 
-        binding.fragmentPlaceholder.beVisibleIf(contacts.isEmpty())
+        binding.fragmentPlaceholder.beGone()
         (binding.fragmentList.adapter as? ContactsAdapter)?.updateItems(contacts, fixedText)
         setupLetterFastScroller(contacts)
     }

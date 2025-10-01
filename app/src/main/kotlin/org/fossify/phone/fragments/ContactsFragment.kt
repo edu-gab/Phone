@@ -32,6 +32,7 @@ import org.fossify.phone.extensions.setupWithContacts
 import org.fossify.phone.extensions.startCallWithConfirmationCheck
 import org.fossify.phone.extensions.startContactDetailsIntent
 import org.fossify.phone.interfaces.RefreshItemsListener
+import android.view.View
 
 class ContactsFragment(context: Context, attributeSet: AttributeSet) : MyViewPagerFragment<MyViewPagerFragment.LettersInnerBinding>(context, attributeSet),
     RefreshItemsListener {
@@ -45,31 +46,20 @@ class ContactsFragment(context: Context, attributeSet: AttributeSet) : MyViewPag
     }
 
     override fun setupFragment() {
-        val placeholderResId = if (context.hasPermission(PERMISSION_READ_CONTACTS)) {
-            R.string.no_contacts_found
-        } else {
-            R.string.could_not_access_contacts
-        }
 
-        binding.fragmentPlaceholder.text = context.getString(placeholderResId)
+        binding.fragmentPlaceholder.visibility = View.GONE
+        binding.fragmentPlaceholder2.visibility = View.GONE
+        binding.fragmentPlaceholder.text = ""
+        binding.fragmentPlaceholder2.text = ""
 
-        val placeholderActionResId = if (context.hasPermission(PERMISSION_READ_CONTACTS)) {
-            R.string.create_new_contact
-        } else {
-            R.string.request_access
-        }
+        // DESHABILITAR COMPLETAMENTE
+        binding.fragmentPlaceholder.isEnabled = false
+        binding.fragmentPlaceholder2.isEnabled = false
+        binding.fragmentPlaceholder.isClickable = false
+        binding.fragmentPlaceholder2.isClickable = false
 
-        binding.fragmentPlaceholder2.apply {
-            text = context.getString(placeholderActionResId)
-            underlineText()
-            setOnClickListener {
-                if (context.hasPermission(PERMISSION_READ_CONTACTS)) {
-                    activity?.launchCreateNewContactIntent()
-                } else {
-                    requestReadContactsPermission()
-                }
-            }
-        }
+        // ELIMINAR LOS LISTENERS
+        binding.fragmentPlaceholder2.setOnClickListener(null)
     }
 
     override fun setupColors(textColor: Int, primaryColor: Int, properPrimaryColor: Int) {
@@ -111,8 +101,8 @@ class ContactsFragment(context: Context, attributeSet: AttributeSet) : MyViewPag
         setupLetterFastScroller(contacts)
         if (contacts.isEmpty()) {
             binding.apply {
-                fragmentPlaceholder.beVisible()
-                fragmentPlaceholder2.beVisible()
+                fragmentPlaceholder.beGone()
+                fragmentPlaceholder2.beGone()
                 fragmentList.beGone()
             }
         } else {
@@ -152,7 +142,7 @@ class ContactsFragment(context: Context, attributeSet: AttributeSet) : MyViewPag
     }
 
     override fun onSearchClosed() {
-        binding.fragmentPlaceholder.beVisibleIf(allContacts.isEmpty())
+        binding.fragmentPlaceholder.beGone()
         (binding.fragmentList.adapter as? ContactsAdapter)?.updateItems(allContacts)
         setupLetterFastScroller(allContacts)
     }
@@ -180,7 +170,7 @@ class ContactsFragment(context: Context, attributeSet: AttributeSet) : MyViewPag
             !getProperText(nameToDisplay, shouldNormalize).startsWith(fixedText, true) && !nameToDisplay.contains(fixedText, true)
         }
 
-        binding.fragmentPlaceholder.beVisibleIf(filtered.isEmpty())
+        binding.fragmentPlaceholder.beGone()
         (binding.fragmentList.adapter as? ContactsAdapter)?.updateItems(filtered, fixedText)
         setupLetterFastScroller(filtered)
     }
@@ -188,8 +178,8 @@ class ContactsFragment(context: Context, attributeSet: AttributeSet) : MyViewPag
     private fun requestReadContactsPermission() {
         activity?.handlePermission(PERMISSION_READ_CONTACTS) {
             if (it) {
-                binding.fragmentPlaceholder.text = context.getString(R.string.no_contacts_found)
-                binding.fragmentPlaceholder2.text = context.getString(R.string.create_new_contact)
+                //binding.fragmentPlaceholder.text = context.getString(R.string.no_contacts_found)
+                //binding.fragmentPlaceholder2.text = context.getString(R.string.create_new_contact)
                 ContactsHelper(context).getContacts(showOnlyContactsWithNumbers = true) { contacts ->
                     activity?.runOnUiThread {
                         gotContacts(contacts)
